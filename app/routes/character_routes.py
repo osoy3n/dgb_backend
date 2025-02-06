@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Query
 from sqlmodel import select
+from typing import List
 
 from database.db_config import SessionDependency
-from models.character_models import Personaje
+from models.character_models import Personaje, ActualizarPersonaje
 from libs.get_external_api import dragon_ball_api
 
 router = APIRouter()
@@ -36,5 +37,37 @@ async def crear_personajes(session: SessionDependency):
     response_model=Personaje,
     status_code=status.HTTP_201_CREATED
 )
-async def crear_personaje(data: Personaje, session: SessionDependency):
+async def crear_personaje(data_personaje: Personaje, session: SessionDependency):
+    dic_personaje = data_personaje.model_dump()
+    personaje = Personaje.model_validate(dic_personaje)
+    session.add(personaje)
+    session.commit()
+    session.refresh(personaje)
+    return personaje
+
+@router.get(
+    "/personajes",
+    response_model=List[Personaje],
+    status_code=status.HTTP_200_OK
+)
+async def obtener_personajes(session: SessionDependency):
+    return session.exec(select(Personaje)).all()
+
+@router.get(
+    "/personajes/{id_personaje}",
+    response_model=Personaje,
+    status_code=status.HTTP_200_OK
+)
+async def obtener_personaje(id_personaje: int, session: SessionDependency):
+    personaje = session.get(Personaje, id_personaje)
+    if not personaje:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Personaje no encontrado")
+    return personaje
+
+@router.patch(
+    "/personajes/{id_personaje}",
+    response_model=Personaje,
+    status_code=status.HTTP_201_CREATED
+)
+async def actualizar_personaje(id_personaje: int, data_personaje: ActualizarPersonaje, session: SessionDependency):
     pass
