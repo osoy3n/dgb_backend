@@ -70,4 +70,20 @@ async def obtener_personaje(id_personaje: int, session: SessionDependency):
     status_code=status.HTTP_201_CREATED
 )
 async def actualizar_personaje(id_personaje: int, data_personaje: ActualizarPersonaje, session: SessionDependency):
-    pass
+    personaje = await obtener_personaje(id_personaje, session)
+    dic_personaje = data_personaje.model_dump(exclude_unset=True)
+    personaje.sqlmodel_update(dic_personaje)
+    session.add(personaje)
+    session.commit()
+    session.refresh(personaje)
+    return personaje
+
+@router.delete(
+    "/personajes/{id_personaje}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def eliminar_personaje(id_personaje: int, session: SessionDependency):
+    personaje = await obtener_personaje(id_personaje, session)
+    session.delete(personaje)
+    session.commit()
+    return {"detail": "Personaje Eliminado"}
