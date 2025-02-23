@@ -4,7 +4,7 @@ from typing import List
 
 from database.db_config import SessionDependency
 from models.character_models import Personaje, ActualizarPersonaje
-from libs.get_external_api import dragon_ball_api
+from libs.get_external_api import dragon_ball_api, generar_valores_random
 
 router = APIRouter()
 
@@ -25,12 +25,13 @@ async def crear_personajes(session: SessionDependency):
             imagen = personaje_externo['image'],
             ki = personaje_externo['ki'],
             maxKi = personaje_externo['maxKi'],
-            nombre = personaje_externo['name']
+            nombre = personaje_externo['name'],
+            precio = generar_valores_random()
         )
         session.add(personaje)
 
     session.commit()
-    return { "mensaje":  "Personajes creados exitosamente" }
+    return { "mensaje": "Personajes creados exitosamente" }
 
 @router.post(
     "/personajes",

@@ -1,4 +1,5 @@
 
+import random
 import requests
 
 def dragon_ball_api():
@@ -20,3 +21,6 @@ def dragon_ball_api():
         print(f"Timeout: {errt}")
     except requests.exceptions.RequestException as err:
         print(f"Error en la solicitud: {err}")
+
+def generar_valores_random():
+    return random.randrange(4000, 10001, 50)

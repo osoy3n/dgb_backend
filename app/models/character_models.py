@@ -8,6 +8,7 @@ class PersonajeBase(SQLModel):
     ki: str = Field(default=None)
     maxKi: str = Field(default=None)
     nombre: str = Field(default=None)
+    precio: int = Field(default=None)
 
 class Personaje(PersonajeBase, table=True):
     __tablename__ = "personajes"
