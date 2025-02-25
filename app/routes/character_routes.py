@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 from typing import List
 
 from database.db_config import SessionDependency
 from models.character_models import Personaje, ActualizarPersonaje
+from models.shopping_models import Compras
 from libs.get_external_api import dragon_ball_api, generar_valores_random
 
 router = APIRouter()
@@ -84,6 +85,9 @@ async def actualizar_personaje(id_personaje: int, data_personaje: ActualizarPers
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def eliminar_personaje(id_personaje: int, session: SessionDependency):
+    compra = session.exec(select(Compras).where(Compras.id_personaje == id_personaje)).first()
+    if compra:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No se puede eliminar un personaje con compras asociadas")
     personaje = await obtener_personaje(id_personaje, session)
     session.delete(personaje)
     session.commit()
