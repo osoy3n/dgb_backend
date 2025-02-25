@@ -16,5 +16,5 @@ class Compras(ComprasBase, table=True):
     orden: "Orden" = Relationship(back_populates="compras_orden")
     personaje: "Personaje" = Relationship(back_populates="compras_personaje")
 
-class CrearActualizarOrden(ComprasBase):
+class CrearActualizarCompra(ComprasBase):
     pass
