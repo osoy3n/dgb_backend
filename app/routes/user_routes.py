@@ -65,4 +65,4 @@ async def eliminar_usuario(id_usuario: int, session: SessionDependency):
     usuario = await obtener_usuario(id_usuario, session)
     session.delete(usuario)
     session.commit()
-    return {"detail": "Personaje Eliminado"}
+    return {"detail": "Usuario Eliminado"}
