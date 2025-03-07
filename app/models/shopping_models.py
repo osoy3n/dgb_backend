@@ -1,9 +1,12 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
+
+from models.character_models import PersonajeBase
+from models.order_models import OrdenBase
 
 if TYPE_CHECKING:
-    from models.character_models import Personaje
-    from models.order_models import Orden
+    from models.character_models import Personaje, PersonajeBase
+    from models.order_models import Orden, OrdenBase
 
 class ComprasBase(SQLModel):
     id_personaje: int = Field(foreign_key="personajes.id")
@@ -18,3 +21,10 @@ class Compras(ComprasBase, table=True):
 
 class CrearActualizarCompra(ComprasBase):
     pass
+
+class ComprasHechas(SQLModel):
+    id_compra: int
+    id_personaje: int
+    id_orden: int
+    orden: OrdenBase
+    personaje: PersonajeBase
