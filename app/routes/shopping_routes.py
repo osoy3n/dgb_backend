@@ -3,7 +3,9 @@ from sqlmodel import select
 from typing import List
 
 from database.db_config import SessionDependency
-from models.shopping_models import Compras, CrearActualizarCompra
+from models.character_models import Personaje
+from models.order_models import Orden
+from models.shopping_models import Compras, CrearActualizarCompra, ComprasHechas
 
 router = APIRouter()
 
@@ -62,3 +64,44 @@ async def eliminar_compra(id_compra: int, session: SessionDependency):
     session.delete(compra)
     session.commit()
     return {"detail": "Compra Eliminada"}
+
+@router.get(
+    "/lista_compras",
+    response_model=List[ComprasHechas],
+    status_code=status.HTTP_200_OK
+)
+async def lista_de_compras(session: SessionDependency):
+    consulta_unida = (
+        select(Compras)
+        .join(Orden)
+        .join(Personaje)
+    )
+    compras = session.exec(consulta_unida).all()
+
+    if not compras:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No hay compras registradas")
+
+    respuesta = [
+        {
+            "id_compra": compra.id,
+            "id_personaje": compra.id_personaje,
+            "id_orden": compra.id_orden,
+            "orden": {
+                "total_item": compra.orden.total_item,
+                "total_precio": compra.orden.total_precio,
+                "id_usuario": compra.orden.id_usuario
+            },
+            "personaje": {
+                "afiliacion": compra.personaje.afiliacion,
+                "descripcion": compra.personaje.descripcion,
+                "genero": compra.personaje.genero,
+                "imagen": compra.personaje.imagen,
+                "ki": compra.personaje.ki,
+                "maxKi": compra.personaje.maxKi,
+                "nombre": compra.personaje.nombre,
+                "precio": compra.personaje.precio
+            }
+        }
+        for compra in compras
+    ]
+    return respuesta
